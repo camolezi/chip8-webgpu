@@ -45,6 +45,6 @@ pub fn decode_instruction(
 pub fn decode_instructions(instructions: &[RawInstruction]) -> Vec<DynamicInstruction> {
     instructions
         .iter()
-        .map(|inst| decode_instruction(inst.clone()))
+        .map(|inst| decode_instruction(*inst))
         .collect()
 }

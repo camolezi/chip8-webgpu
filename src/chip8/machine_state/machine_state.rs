@@ -4,7 +4,7 @@ use super::configuration::{
     CHIP8_MEMORY_SIZE, CHIP8_NUMBER_OF_DATA_REGISTERS, CHIP8_STACK_INITIAL_SIZE,
 };
 
-pub struct Chip8Chip8MemoryVirtualMachineState {
+pub struct Chip8VMState {
     memory: Chip8Memory,
     registers: Chip8Registers,
     program_counter: Chip8Address,
@@ -28,9 +28,9 @@ pub struct Chip8Timers {
     sound: Byte,
 }
 
-impl Default for Chip8Chip8MemoryVirtualMachineState {
+impl Default for Chip8VMState {
     fn default() -> Self {
-        Chip8Chip8MemoryVirtualMachineState {
+        Self {
             memory: [0; CHIP8_MEMORY_SIZE],
             registers: Chip8Registers {
                 data: [0; CHIP8_NUMBER_OF_DATA_REGISTERS],

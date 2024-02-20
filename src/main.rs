@@ -1,7 +1,3 @@
-#![deny(clippy::all)]
-#![warn(clippy::pedantic)]
-#![warn(clippy::nursery)]
-
 use chip8_webgpu::{
     chip8::{
         decoder::bit_manipulation::group_in_raw_instructions,
