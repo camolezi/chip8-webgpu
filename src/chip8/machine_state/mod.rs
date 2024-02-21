@@ -1,2 +1,7 @@
 mod configuration;
-mod machine_state;
+mod memory;
+mod program_counter;
+mod registers;
+mod screen;
+pub mod state;
+mod timers;
