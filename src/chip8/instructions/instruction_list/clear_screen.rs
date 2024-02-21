@@ -1,4 +1,6 @@
-use crate::chip8::instructions::base_instruction::IsInstruction;
+use crate::chip8::{
+    instructions::base_instruction::IsInstruction, machine_state::state::Chip8VMState,
+};
 
 #[derive(Debug)]
 pub struct ClearScreenInstruction {}
@@ -16,7 +18,7 @@ impl IsInstruction for ClearScreenInstruction {
         "".to_string()
     }
 
-    fn execute(&self) {
-        todo!()
+    fn execute(&self, vm_state: &mut Chip8VMState) {
+        vm_state.screen.clean_screen();
     }
 }

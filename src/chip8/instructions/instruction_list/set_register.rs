@@ -1,4 +1,7 @@
-use crate::chip8::{basic_types::Byte, instructions::base_instruction::IsInstruction};
+use crate::chip8::{
+    basic_types::Byte, instructions::base_instruction::IsInstruction,
+    machine_state::state::Chip8VMState,
+};
 
 #[derive(Debug)]
 pub struct SetRegisterInstruction {
@@ -19,7 +22,9 @@ impl IsInstruction for SetRegisterInstruction {
         format!("V{}, {:x}", self.register_number, self.data)
     }
 
-    fn execute(&self) {
-        todo!()
+    fn execute(&self, vm_state: &mut Chip8VMState) {
+        vm_state
+            .registers
+            .set_data_register(self.register_number, self.data)
     }
 }

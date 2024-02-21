@@ -1,4 +1,9 @@
-use crate::chip8::{basic_types::Byte, instructions::base_instruction::IsInstruction};
+use crate::chip8::{
+    basic_types::{Byte, ExpandedByte},
+    decoder::bit_manipulation,
+    instructions::base_instruction::IsInstruction,
+    machine_state::state::Chip8VMState,
+};
 
 #[derive(Debug)]
 pub struct DrawSprite {
@@ -23,7 +28,23 @@ impl IsInstruction for DrawSprite {
         )
     }
 
-    fn execute(&self) {
-        todo!()
+    fn execute(&self, vm_state: &mut Chip8VMState) {
+        let sprite_start_address = vm_state.registers.get_address_register();
+        let sprite_data = vm_state
+            .memory
+            .read_memory(sprite_start_address, self.sprite_size);
+
+        let bit_sprite_data: Vec<ExpandedByte> = sprite_data
+            .iter()
+            .map(|&byte| bit_manipulation::get_byte_bits(byte))
+            .collect();
+
+        let collision = vm_state.screen.draw_sprite(
+            self.x_position_register,
+            self.y_position_register,
+            &bit_sprite_data,
+        );
+
+        vm_state.registers.set_data_register(15, collision)
     }
 }

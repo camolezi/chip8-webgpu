@@ -1,4 +1,7 @@
-use crate::chip8::{basic_types::Chip8Address, instructions::base_instruction::IsInstruction};
+use crate::chip8::{
+    basic_types::Chip8Address, instructions::base_instruction::IsInstruction,
+    machine_state::state::Chip8VMState,
+};
 
 #[derive(Debug)]
 pub struct SetAddressRegister {
@@ -18,7 +21,7 @@ impl IsInstruction for SetAddressRegister {
         format!("0x{:x}", self.address)
     }
 
-    fn execute(&self) {
-        todo!()
+    fn execute(&self, vm_state: &mut Chip8VMState) {
+        vm_state.registers.set_address_register(self.address)
     }
 }

@@ -1,10 +1,20 @@
-use crate::chip8::basic_types::{Byte, Chip8Address, RawInstruction};
+use crate::chip8::basic_types::{Byte, Chip8Address, ExpandedByte, RawInstruction};
 
 pub fn get_byte_nibbles(byte: Byte) -> (Byte, Byte) {
     let first_nibble = byte >> 4;
     let second_nibble = byte & 0x0F;
 
     (first_nibble, second_nibble)
+}
+
+pub fn get_byte_bits(byte: Byte) -> ExpandedByte {
+    let mut bits = [0; 8];
+
+    for i in 0..8 {
+        bits[i] = (byte >> i) & 1
+    }
+
+    bits
 }
 
 pub fn group_in_raw_instructions(bytes: &[Byte]) -> Vec<RawInstruction> {
