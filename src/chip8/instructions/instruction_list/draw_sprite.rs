@@ -30,6 +30,7 @@ impl IsInstruction for DrawSprite {
 
     fn execute(&self, vm_state: &mut Chip8VMState) {
         let sprite_start_address = vm_state.registers.get_address_register();
+
         let sprite_data = vm_state
             .memory
             .read_memory(sprite_start_address, self.sprite_size);
@@ -39,11 +40,17 @@ impl IsInstruction for DrawSprite {
             .map(|&byte| bit_manipulation::get_byte_bits(byte))
             .collect();
 
-        let collision = vm_state.screen.draw_sprite(
-            self.x_position_register,
-            self.y_position_register,
-            &bit_sprite_data,
-        );
+        let x_position = vm_state
+            .registers
+            .get_data_register(self.x_position_register);
+
+        let y_position = vm_state
+            .registers
+            .get_data_register(self.y_position_register);
+
+        let collision = vm_state
+            .screen
+            .draw_sprite(x_position, y_position, &bit_sprite_data);
 
         vm_state.registers.set_data_register(15, collision)
     }

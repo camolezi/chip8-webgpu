@@ -22,4 +22,8 @@ impl ProgramCounter {
     pub fn get_pc(&self) -> Chip8Address {
         self.counter
     }
+
+    pub fn next(&mut self) {
+        self.counter += 2;
+    }
 }

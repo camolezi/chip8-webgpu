@@ -21,6 +21,12 @@ impl Chip8Display {
         self.pixel_data.iter_mut().for_each(|row| row.fill(0));
     }
 
+    pub fn get_screen_state(
+        &self,
+    ) -> &[[Chip8DisplayPixel; CHIP8_SCREEN_WIDTH]; CHIP8_SCREEN_HEIGHT] {
+        &self.pixel_data
+    }
+
     pub fn draw_sprite(&mut self, x: Byte, y: Byte, sprite_data: &[ExpandedByte]) -> Byte {
         let usize_x = x as usize;
         let usize_y = y as usize;
@@ -30,14 +36,18 @@ impl Chip8Display {
             .iter()
             .enumerate()
             .for_each(|(index_y, expanded_byte)| {
-                expanded_byte.iter().enumerate().for_each(|(index_x, bit)| {
-                    let current_pixel = &mut self.pixel_data[usize_y + index_y][usize_x + index_x];
+                expanded_byte
+                    .iter()
+                    .enumerate()
+                    .for_each(|(index_x, &bit)| {
+                        let current_pixel =
+                            &mut self.pixel_data[usize_y + index_y][usize_x + index_x];
 
-                    if *current_pixel & bit == 1 {
-                        collision = 1;
-                    }
-                    *current_pixel ^= bit;
-                })
+                        if *current_pixel & bit == 1 {
+                            collision = 1;
+                        }
+                        *current_pixel ^= bit;
+                    })
             });
 
         collision

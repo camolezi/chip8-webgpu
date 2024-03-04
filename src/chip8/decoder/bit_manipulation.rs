@@ -10,8 +10,8 @@ pub fn get_byte_nibbles(byte: Byte) -> (Byte, Byte) {
 pub fn get_byte_bits(byte: Byte) -> ExpandedByte {
     let mut bits = [0; 8];
 
-    for i in 0..8 {
-        bits[i] = (byte >> i) & 1
+    for (i, bit) in bits.iter_mut().enumerate() {
+        *bit = (byte >> (7 - i)) & 1;
     }
 
     bits
@@ -37,4 +37,16 @@ pub fn combine_address_nibbles(
         ((first_nibble as u16) << 8) | ((second_nibble as u16) << 4) | (third_nibble as u16);
 
     result_address
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_byte_bits() {
+        let input_byte = 56;
+        let expected_result: ExpandedByte = [0, 0, 1, 1, 1, 0, 0, 0];
+        assert_eq!(get_byte_bits(input_byte), expected_result);
+    }
 }
