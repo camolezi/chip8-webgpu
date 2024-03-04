@@ -1,3 +1,9 @@
+use std::{
+    sync::mpsc,
+    thread,
+    time::{Duration, Instant},
+};
+
 use chip8_webgpu::{
     chip8::{
         basic_types::RawInstruction, decoder::decode::decode_instruction,
@@ -16,27 +22,41 @@ const PIXEL_SPACING: f32 = 0.0;
 #[macroquad::main("Chip8 Emulator")]
 async fn main() {
     let rom_data = storage::read_rom("ibm_logo_2").expect("Unable to load rom");
+    let (tx, rx) = mpsc::channel();
 
-    let mut vm_state = Chip8VMState::default();
-    vm_state.memory.load_rom(&rom_data);
+    thread::spawn(move || {
+        let mut vm_state = Chip8VMState::default();
+        vm_state.memory.load_rom(&rom_data);
 
-   // let (tx, rx) = mpsc::channel();
+        let mut last_message_time = Instant::now();
+
+        loop {
+            let current_instruction_address = vm_state.program_counter.get_pc();
+            let current_instruction_data =
+                vm_state.memory.read_memory(current_instruction_address, 2);
+            vm_state.program_counter.next();
+
+            let decoded_instruction = decode_instruction(RawInstruction(
+                current_instruction_data[0],
+                current_instruction_data[1],
+            ));
+
+            decoded_instruction.execute(&mut vm_state);
+
+            let now = Instant::now();
+            if now.duration_since(last_message_time) >= Duration::from_millis(16) {
+                tx.send(*vm_state.screen.get_screen_state()).unwrap();
+                last_message_time = now;
+            }
+
+            thread::sleep(Duration::from_millis(1));
+        }
+    });
 
     loop {
-        let current_instruction_address = vm_state.program_counter.get_pc();
-        let current_instruction_data = vm_state.memory.read_memory(current_instruction_address, 2);
-        vm_state.program_counter.next();
-
-        let decoded_instruction = decode_instruction(RawInstruction(
-            current_instruction_data[0],
-            current_instruction_data[1],
-        ));
-
-        decoded_instruction.execute(&mut vm_state);
+        let screen_state = rx.recv().unwrap();
 
         clear_background(GRAY);
-
-        let screen_state = vm_state.screen.get_screen_state();
 
         for (y_index, pixel_row) in screen_state.iter().enumerate() {
             for (x_index, &pixel) in pixel_row.iter().enumerate() {
