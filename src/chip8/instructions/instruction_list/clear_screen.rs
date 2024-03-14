@@ -6,10 +6,6 @@ use crate::chip8::{
 pub struct ClearScreenInstruction {}
 
 impl IsInstruction for ClearScreenInstruction {
-    fn full_name(&self) -> &'static str {
-        "Clear Screen"
-    }
-
     fn mnemonic_name(&self) -> &'static str {
         "CLR"
     }

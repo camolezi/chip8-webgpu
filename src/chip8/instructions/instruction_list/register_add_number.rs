@@ -10,10 +10,6 @@ pub struct RegisterAddNumberInstruction {
 }
 
 impl IsInstruction for RegisterAddNumberInstruction {
-    fn full_name(&self) -> &'static str {
-        "Register Add Number"
-    }
-
     fn mnemonic_name(&self) -> &'static str {
         "ADDN"
     }

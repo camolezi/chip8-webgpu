@@ -13,10 +13,6 @@ pub struct DrawSprite {
 }
 
 impl IsInstruction for DrawSprite {
-    fn full_name(&self) -> &'static str {
-        "Draw Sprite"
-    }
-
     fn mnemonic_name(&self) -> &'static str {
         "DRW"
     }

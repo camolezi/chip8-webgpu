@@ -9,10 +9,6 @@ pub struct JumpInstruction {
 }
 
 impl IsInstruction for JumpInstruction {
-    fn full_name(&self) -> &'static str {
-        "Jump"
-    }
-
     fn mnemonic_name(&self) -> &'static str {
         "JUMP"
     }

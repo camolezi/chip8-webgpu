@@ -6,10 +6,6 @@ use crate::chip8::{
 pub struct NotOpcode {}
 
 impl IsInstruction for NotOpcode {
-    fn full_name(&self) -> &'static str {
-        "Not Opcode"
-    }
-
     fn mnemonic_name(&self) -> &'static str {
         "NOTOP"
     }

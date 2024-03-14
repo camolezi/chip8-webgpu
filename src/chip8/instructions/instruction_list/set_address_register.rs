@@ -9,10 +9,6 @@ pub struct SetAddressRegister {
 }
 
 impl IsInstruction for SetAddressRegister {
-    fn full_name(&self) -> &'static str {
-        "Set Address Register"
-    }
-
     fn mnemonic_name(&self) -> &'static str {
         "SETI"
     }
