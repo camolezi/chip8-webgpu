@@ -1,15 +1,12 @@
-use std::{
-    sync::mpsc,
-    thread,
-    time::{Duration, Instant},
-};
+use std::{sync::mpsc, thread, time::Duration};
 
 use chip8_webgpu::{
     chip8::{
-        basic_types::RawInstruction, decoder::decode::decode_instruction,
-        machine_state::state::Chip8VMState,
+        basic_types::RawInstruction,
+        decoder::decode::decode_instruction,
+        machine_state::{state::Chip8VMState, Chip8DisplayData},
     },
-    utilities::storage,
+    utilities::{execution_timer::ExecutionTimer, storage},
 };
 
 use macroquad::prelude::*;
@@ -21,37 +18,9 @@ const PIXEL_SPACING: f32 = 0.0;
 
 #[macroquad::main("Chip8 Emulator")]
 async fn main() {
-    let rom_data = storage::read_rom("ibm_logo_2").expect("Unable to load rom");
     let (tx, rx) = mpsc::channel();
 
-    thread::spawn(move || {
-        let mut vm_state = Chip8VMState::default();
-        vm_state.memory.load_rom(&rom_data);
-
-        let mut last_message_time = Instant::now();
-
-        loop {
-            let current_instruction_address = vm_state.program_counter.get_pc();
-            let current_instruction_data =
-                vm_state.memory.read_memory(current_instruction_address, 2);
-            vm_state.program_counter.next();
-
-            let decoded_instruction = decode_instruction(RawInstruction(
-                current_instruction_data[0],
-                current_instruction_data[1],
-            ));
-
-            decoded_instruction.execute(&mut vm_state);
-
-            let now = Instant::now();
-            if now.duration_since(last_message_time) >= Duration::from_millis(16) {
-                tx.send(*vm_state.screen.get_screen_state()).unwrap();
-                last_message_time = now;
-            }
-
-            thread::sleep(Duration::from_millis(1));
-        }
-    });
+    thread::spawn(move || run_emulation_thread(tx));
 
     loop {
         let screen_state = rx.recv().unwrap();
@@ -98,4 +67,42 @@ async fn main() {
     //        .expect("was not able to write file")
 }
 
-fn debug_print_pixel() {}
+const FRAMES_PER_SECOND: u64 = 60;
+const EMULATION_RUNS_PER_SECOND: u64 = 500;
+
+const FRAME_INTERVAL: Duration = Duration::from_millis(1000 / FRAMES_PER_SECOND);
+const EMULATION_INTERVAL: Duration = Duration::from_millis(1000 / EMULATION_RUNS_PER_SECOND);
+
+fn run_emulation_thread(tx: mpsc::Sender<Chip8DisplayData>) {
+    let rom_data = storage::read_rom("ibm_logo_2").expect("Unable to load rom");
+
+    let mut vm_state = Chip8VMState::default();
+    vm_state.memory.load_rom(&rom_data);
+
+    let mut frame_execution_timer = ExecutionTimer::new(FRAME_INTERVAL);
+    let mut emulation_execution_timer = ExecutionTimer::new(EMULATION_INTERVAL);
+
+    let sleep_interval: Duration = std::cmp::min(FRAME_INTERVAL, EMULATION_INTERVAL);
+
+    loop {
+        emulation_execution_timer.run(|| {
+            let current_instruction_address = vm_state.program_counter.get_pc();
+            let current_instruction_data =
+                vm_state.memory.read_memory(current_instruction_address, 2);
+            vm_state.program_counter.next();
+
+            let decoded_instruction = decode_instruction(RawInstruction(
+                current_instruction_data[0],
+                current_instruction_data[1],
+            ));
+
+            decoded_instruction.execute(&mut vm_state);
+        });
+
+        frame_execution_timer.run(|| {
+            tx.send(*vm_state.screen.get_screen_state()).unwrap();
+        });
+
+        thread::sleep(sleep_interval);
+    }
+}

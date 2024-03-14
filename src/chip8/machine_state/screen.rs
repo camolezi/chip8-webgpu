@@ -3,9 +3,10 @@ use crate::chip8::basic_types::{Byte, ExpandedByte};
 
 type Chip8DisplayPixel = Byte;
 
+pub type Chip8DisplayData = [[Chip8DisplayPixel; CHIP8_SCREEN_WIDTH]; CHIP8_SCREEN_HEIGHT];
+
 pub struct Chip8Display {
-    //change this to use 8 pixel group (maybe not, is going to be difficult to ...)
-    pixel_data: [[Chip8DisplayPixel; CHIP8_SCREEN_WIDTH]; CHIP8_SCREEN_HEIGHT],
+    pixel_data: Chip8DisplayData,
 }
 
 impl Default for Chip8Display {
@@ -21,9 +22,7 @@ impl Chip8Display {
         self.pixel_data.iter_mut().for_each(|row| row.fill(0));
     }
 
-    pub fn get_screen_state(
-        &self,
-    ) -> &[[Chip8DisplayPixel; CHIP8_SCREEN_WIDTH]; CHIP8_SCREEN_HEIGHT] {
+    pub fn get_screen_state(&self) -> &Chip8DisplayData {
         &self.pixel_data
     }
 
