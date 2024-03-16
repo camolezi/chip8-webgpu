@@ -5,10 +5,11 @@ use crate::chip8::{
         base_instruction::DynamicInstruction,
         instruction_list::{
             add_number_register::AddNumberRegisterInstruction,
-            clear_screen::ClearScreenInstruction, copy_register::CopyRegisterInstruction,
-            draw_sprite::DrawSprite, jump::JumpInstruction, not_opcode::NotOpcode,
-            or_register::OrRegisterInstruction, set_address_register::SetAddressRegister,
-            set_register::SetRegisterInstruction,
+            and_register::AndRegisterInstruction, clear_screen::ClearScreenInstruction,
+            copy_register::CopyRegisterInstruction, draw_sprite::DrawSprite, jump::JumpInstruction,
+            not_opcode::NotOpcode, or_register::OrRegisterInstruction,
+            set_address_register::SetAddressRegister, set_register::SetRegisterInstruction,
+            xor_register::XorRegisterInstruction,
         },
     },
 };
@@ -37,6 +38,14 @@ pub fn decode_instruction(
             copied_register_number: third_nibble,
         }),
         (0x08, _, _, 0x01) => Box::new(OrRegisterInstruction {
+            register_x: second_nibble,
+            register_y: third_nibble,
+        }),
+        (0x08, _, _, 0x02) => Box::new(AndRegisterInstruction {
+            register_x: second_nibble,
+            register_y: third_nibble,
+        }),
+        (0x08, _, _, 0x03) => Box::new(XorRegisterInstruction {
             register_x: second_nibble,
             register_y: third_nibble,
         }),
