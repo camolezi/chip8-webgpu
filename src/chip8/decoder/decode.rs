@@ -4,9 +4,11 @@ use crate::chip8::{
     instructions::{
         base_instruction::DynamicInstruction,
         instruction_list::{
-            clear_screen::ClearScreenInstruction, draw_sprite::DrawSprite, jump::JumpInstruction,
-            not_opcode::NotOpcode, register_add_number::RegisterAddNumberInstruction,
-            set_address_register::SetAddressRegister, set_register::SetRegisterInstruction,
+            add_number_register::AddNumberRegisterInstruction,
+            clear_screen::ClearScreenInstruction, copy_register::CopyRegisterInstruction,
+            draw_sprite::DrawSprite, jump::JumpInstruction, not_opcode::NotOpcode,
+            or_register::OrRegisterInstruction, set_address_register::SetAddressRegister,
+            set_register::SetRegisterInstruction,
         },
     },
 };
@@ -26,9 +28,17 @@ pub fn decode_instruction(
             register_number: second_nibble,
             data: combine_nibbles((third_nibble, fourth_nibble)),
         }),
-        (0x07, _, _, _) => Box::new(RegisterAddNumberInstruction {
+        (0x07, _, _, _) => Box::new(AddNumberRegisterInstruction {
             register_number: second_nibble,
             data: combine_nibbles((third_nibble, fourth_nibble)),
+        }),
+        (0x08, _, _, 0x00) => Box::new(CopyRegisterInstruction {
+            register_number: second_nibble,
+            copied_register_number: third_nibble,
+        }),
+        (0x08, _, _, 0x01) => Box::new(OrRegisterInstruction {
+            register_x: second_nibble,
+            register_y: third_nibble,
         }),
         (0x0a, _, _, _) => Box::new(SetAddressRegister {
             address: combine_address_nibbles((second_nibble, third_nibble, fourth_nibble)),

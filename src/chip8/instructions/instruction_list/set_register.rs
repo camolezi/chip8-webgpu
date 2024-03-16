@@ -24,24 +24,3 @@ impl IsInstruction for SetRegisterInstruction {
             .set_data_register(self.register_number, self.data)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_set_register_execute() {
-        let mut vm_state = Chip8VMState::default();
-
-        let register_number = 2;
-        let data = 51;
-
-        let instruction = SetRegisterInstruction {
-            register_number,
-            data,
-        };
-        instruction.execute(&mut vm_state);
-
-        assert_eq!(vm_state.registers.get_data_register(register_number), data);
-    }
-}

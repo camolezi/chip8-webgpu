@@ -1,7 +1,9 @@
+pub mod add_number_register;
 pub mod clear_screen;
+pub mod copy_register;
 pub mod draw_sprite;
 pub mod jump;
 pub mod not_opcode;
-pub mod register_add_number;
+pub mod or_register;
 pub mod set_address_register;
 pub mod set_register;

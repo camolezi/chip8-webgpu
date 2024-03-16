@@ -4,12 +4,12 @@ use crate::chip8::{
 };
 
 #[derive(Debug)]
-pub struct RegisterAddNumberInstruction {
+pub struct AddNumberRegisterInstruction {
     pub register_number: Byte,
     pub data: Byte,
 }
 
-impl IsInstruction for RegisterAddNumberInstruction {
+impl IsInstruction for AddNumberRegisterInstruction {
     fn mnemonic_name(&self) -> &'static str {
         "ADDN"
     }
